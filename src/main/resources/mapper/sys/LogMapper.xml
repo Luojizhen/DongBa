@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ljz.cy.dao.LogDao">
+    <!-- 在mybatis中可以通过sql元素定义SQL共性内容 ,
+                       假如其它元素中用到此部分内容可以基于include元素进行包含-->
+    <sql id="queryWhereId">
+        FROM sys_logs
+        <where>
+            <if test="username!=null and username!=''">
+                username LIKE CONCAT("%",#{username},"%")
+            </if>
+        </where>
+    </sql>
+    <select id="findPageObjects" resultType="com.ljz.cy.entity.Log">
+        SELECT *
+        <include refid="queryWhereId"/>
+        ORDER BY createdTime DESC
+        LIMIT #{startIndex},#{pageSize}
+    </select>
+    <select id="getRowCount" resultType="int">
+        SELECT count(*)
+        <include refid="queryWhereId"/>
+    </select>
+
+    <!-- 基于ids删除日志信息 -->
+    <delete id="deleteObjects">
+        DELETE FROM sys_logs
+        <where>
+            <if test="ids!=null and ids.length>0">
+                id IN
+                <foreach collection="ids" open="(" close=")" separator="," item="id">
+                    #{id}
+                </foreach>
+            </if>
+            OR 1=2
+        </where>
+    </delete>
+
+</mapper>
